@@ -13,6 +13,10 @@ app.use(parser.urlencoded({
     extended: true
 }));
 
+
+const provider = require('./scripts/data-provider.js'); 
+provider.retrieveCompanies(app); 
+
 // handle other requests for stocks
 stockRouter.handleSingleSymbol(stocks, app);
 stockRouter.handleNameSearch(stocks, app);
