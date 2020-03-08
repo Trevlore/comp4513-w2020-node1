@@ -1,5 +1,14 @@
+const fetch = require('node-fetch'); 
+const _ = require('lodash'); 
 
-// return just the requested stock ~~
+// error messages need to be returned in JSON format 
+const jsonMessage = (msg) => {
+    return {
+        message: msg
+    };
+};
+
+// return just the requested stock 
 const handleSingleSymbol = (stocks, app) => {
     app.get('/stock/:symbol', (req, resp) => {
         const symbolToFind = req.params.symbol.toUpperCase();
@@ -8,17 +17,6 @@ const handleSingleSymbol = (stocks, app) => {
             resp.json(stock);
         } else {
             resp.json(jsonMessage(`Symbol ${symbolToFind} not found`));
-        }
-    });
-    app.put('/stock/:symbol', (req, resp) => {
-        const symbolToUpd = req.params.symbol.toUpperCase();
-        let index = _.findIndex(stocks, ['symbol', symbolToUpd]);
-        if (index < 0) {
-            resp.json(jsonMessage(symbolToUpd + " not found"));
-        }
-        else {
-            stocks[index] = req.body;
-            resp.json(jsonMessage(symbolToUpd + " updated"));
         }
     });
 };
@@ -41,6 +39,16 @@ const handleNameSearch = (stocks, app) => {
 
 };
 
+async function retrievePriceData(symbol, resp) {
+    const url = `http://www.randyconnolly.com/funwebdev/3rd/api/stocks/history.php?symb ol=${symbol}`;
+    // retrieve the response then the json
+    const response = await fetch(url);
+    const prices = await response.json();
+    // return the retrieved price data 
+    resp.json(prices);
+}
+
+
 // return daily price data 
 const handlePriceData = (stocks, app) => {
     app.get('/stock/daily/:symbol', (req, resp) => {
@@ -56,6 +64,7 @@ const handlePriceData = (stocks, app) => {
         }
     });
 }
+
 
 module.exports = {
     handleSingleSymbol,
