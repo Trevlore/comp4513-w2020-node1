@@ -37,6 +37,24 @@
     li.innerHTML = `<em>${msg.user} - ${msg.message}</em>`;
     document.querySelector('#messages').appendChild(li);
     });
+
+
+    // user has entered a new message
+    document.querySelector("#chatForm").addEventListener('submit', e => {
+    e.preventDefault();
+    const entry = document.querySelector("#entry");
+    // send message to server
+    socket.emit('chat from client', entry.value);
+    entry.value = "";
+    });
+    // a new chat message has been received from server
+    socket.on('chat from server', msg => {
+    const li = document.createElement('li');
+    li.textContent = msg.user + ': ' + msg.message;
+    document.querySelector('#messages').appendChild(li);
+    });
+
+
 </script>
 </body>
 </html>

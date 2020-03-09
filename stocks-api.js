@@ -34,6 +34,12 @@ io.on('connection', socket => {
         };
         io.emit('user joined', obj);
     });
+    socket.on('chat from client', msg => {
+        socket.broadcast.emit('chat from server', {
+            user: socket.username,
+            message: msg
+        });
+    });
 });
 
 let port = 8080;
