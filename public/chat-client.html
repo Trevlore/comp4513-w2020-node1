@@ -5,7 +5,7 @@
     <meta name="viewport" content="width=device-width, initial-scale=1">
     <link href='http://fonts.googleapis.com/css?family=Open+Sans' rel='stylesheet' type='text/css'>
     <link rel="stylesheet" href="chat.css">	    
-
+    <script src="/socket.io/socket.io.js"></script>
 </head>
 <body>
 
@@ -26,7 +26,17 @@
 </main>
 
 <script>
-
-</script>    
+    // chat will be on port 3000
+    const socket = io('http://localhost:3000');
+    let username = prompt("What's your username?");
+    document.querySelector('.panel-header h3').textContent =
+    'Chat [' + username + ']';
+    socket.emit('username', username);
+    socket.on('user joined', msg => {
+    const li = document.createElement('li');
+    li.innerHTML = `<em>${msg.user} - ${msg.message}</em>`;
+    document.querySelector('#messages').appendChild(li);
+    });
+</script>
 </body>
 </html>

@@ -10,15 +10,14 @@ const jsonMessage = (msg) => {
 
 async function retrievePriceData(symbol, resp) {
     const url = `http://www.randyconnolly.com/funwebdev/3rd/api/stocks/history.php?symb ol=${symbol}`;
-    // retrieve the response then the json
     const response = await fetch(url);
     const prices = await response.json();
-    // return the retrieved price data 
     resp.json(prices);
 }
 
 const findSymbol = (stocks, req, resp) => {
     const symbolToFind = req.params.symbol.toUpperCase();
+    console.log(symbolToFind)
     const stock = stocks.filter(obj => symbolToFind === obj.symbol);
     if (stock.length > 0) {
         resp.json(stock);
@@ -58,4 +57,29 @@ const findPrices = (stocks, req, resp) => {
     }
 };
 
-module.exports = { findSymbol, updateSymbol, findName, findPrices };   
+const insertSymbol = (stocks, req, resp) => {
+    const symbolToFind = req.params.symbol.toUpperCase();
+    const stock = stocks.filter(obj => symbolToFind === obj.symbol);
+    if (stock.length > 0) {
+        resp.json(jsonMessage(`Symbol ${symbolToFind} already exists`));
+    } else {
+        //build stock object
+        console.log( req.body);
+        stocks.push( req.body);
+        resp.json(jsonMessage(`Symbol ${symbolToFind} added`));
+    }
+  
+}
+
+const deleteSymbol = (stocks, req, resp) => {
+    const symbolToFind = req.params.symbol.toUpperCase();
+    const removed = _.remove(stocks, obj => { return obj.symbol === symbolToFind});
+    if (removed.length > 0 ) {
+        resp.json(jsonMessage(`${symbolToFind} removed`));
+    } else {
+        resp.json(jsonMessage(`Symbol ${symbolToFind} not found`));
+    }
+    
+}
+
+module.exports = { findSymbol, updateSymbol, findName, findPrices , insertSymbol, deleteSymbol};   
