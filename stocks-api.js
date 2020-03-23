@@ -1,4 +1,5 @@
 const path = require('path');
+const _ = require('lodash');
 const parser = require('body-parser');
 const express = require('express');
 const stocks = require('./scripts/data-provider.js');
@@ -22,24 +23,49 @@ app.use('/socket.io', express.static(path.join(__dirname,
 
 const server = require('socket.io');
 const io = new server(3000);
+let users = [];
+
 
 io.on('connection', socket => {
     console.log('new connection made with client');
+
     socket.on('username', msg => {
-        console.log('username: ' + msg);
-        socket.username = msg;
+       
+        const id = Math.floor((Math.random() * 70) + 1);
+        const group = Math.random() >= 0.5 ? "men" : "women" ;
+
+        socket.user = {id : id, name : msg, group : group};
+        users.push(socket.user)
+         
+        console.log(users);
+        
         const obj = {
             message: "Has joined",
-            user: msg
+            newUser: msg,
+            users: users
         };
         io.emit('user joined', obj);
     });
+
     socket.on('chat from client', msg => {
         socket.broadcast.emit('chat from server', {
-            user: socket.username,
+            user: socket.user,
             message: msg
         });
     });
+
+    socket.on('user exit', msg => {
+        console.log(msg);
+        _.remove(users,(user) => {return user.name === msg});
+        const obj = {
+            message: "Has Left",
+            newUser: msg,
+            users: users
+        };
+        console.log(users);
+        io.emit('user joined', obj);
+    });
+    
 });
 
 let port = 8080;
